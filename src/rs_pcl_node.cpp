@@ -10,16 +10,16 @@
 
 //#include <pcl/sample_consensus/method_types.h>
 //#include <pcl/sample_consensus/model_types.h>
-#include <pcl/segmentation/sac_segmentation.h>
+//#include <pcl/segmentation/sac_segmentation.h>
 
 ros::Publisher pub;
 pcl::PassThrough<pcl::PCLPointCloud2> pass, pass_1;
 pcl::PCLPointCloud2 *cloud_filtered = new pcl::PCLPointCloud2;
 pcl::PCLPointCloud2ConstPtr cloud_filtered_ptr(cloud_filtered);
 
-pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
-pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
-pcl::SACSegmentation<pcl::PCLPointCloud2> seg;
+// pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
+// pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
+// pcl::SACSegmentation<pcl::PCLPointCloud2> seg;
 
 void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
 {
