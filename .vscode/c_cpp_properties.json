@@ -1,21 +1,27 @@
 {
-  "configurations": [
-    {
-      "browse": {
-        "databaseFilename": "",
-        "limitSymbolsToIncludedHeaders": true
-      },
-      "includePath": [
-        "/home/kishan/u_catkin_ws/devel/include/**",
-        "/home/kishan/catkin_ws/devel/include/**",
-        "/opt/ros/melodic/include/**",
-        "/home/kishan/catkin_ws/src/beginner_tutorials/include/**",
-        "/home/kishan/catkin_ws/src/husky_highlevel_controller/include/**",
-        "/home/kishan/catkin_ws/src/ros_best_practices/ros_package_template/include/**",
-        "/home/kishan/u_catkin_ws/src/rs_pcl_demo/include/**",
-        "/usr/include/**"
-      ],
-      "name": "ROS"
-    }
-  ]
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/kishan/u_catkin_ws/devel/include/**",
+                "/home/kishan/catkin_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/kishan/catkin_ws/src/beginner_tutorials/include/**",
+                "/home/kishan/catkin_ws/src/husky_highlevel_controller/include/**",
+                "/home/kishan/catkin_ws/src/ros_best_practices/ros_package_template/include/**",
+                "/home/kishan/u_catkin_ws/src/rs_pcl_demo/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "configurationProvider": "b2.catkin_tools"
+        }
+    ],
+    "version": 4
 }
