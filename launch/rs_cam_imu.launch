@@ -19,4 +19,5 @@
         <param name="reverse_tf" type="bool" value="false" />
     </node>
     <node pkg="rs_pcl_demo" type="tf" name="tf" />
+    <node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" />
 </launch>
