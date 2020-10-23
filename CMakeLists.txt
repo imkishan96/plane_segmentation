@@ -210,3 +210,6 @@ include_directories(
 
 add_executable(rs_pcl_node src/rs_pcl_node.cpp)
 target_link_libraries(rs_pcl_node ${catkin_LIBRARIES})
+
+add_executable(tf src/tf.cpp)
+target_link_libraries(tf ${catkin_LIBRARIES})
