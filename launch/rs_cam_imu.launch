@@ -1,7 +1,7 @@
 <launch>
     <arg name="offline"          default="false"/>
     <include unless="$(arg offline)" 
-        file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch">
+        file="$(find rs_pcl_demo)/launch/rs_d435i.launch">
         <arg name="enable_gyro" value="true"/>
         <arg name="enable_accel"    value="true"/>
         <!--<arg name="device_type" value="d435i"/>-->
@@ -18,6 +18,8 @@
         <param name="fixed_frame" type="string" value="odom" />
         <param name="reverse_tf" type="bool" value="false" />
     </node>
-    <node pkg="rs_pcl_demo" type="tf" name="tf" />
-    <node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" />
+    <!--node pkg="rs_pcl_demo" type="tf" name="tf" /-->
+    <!--node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" /-->
+    <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find rs_pcl_demo)/rviz/rs_cam_imu.rviz" required="true"/-->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rs_pcl_demo)/rviz/debug.rviz" required="true"/>
 </launch>

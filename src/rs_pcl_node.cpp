@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include <tf/LinearMath/Quaternion.h>
+#include <tf/tf.h>
 // PCL specific includes
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/filters/passthrough.h>
@@ -15,6 +17,8 @@
 #include <pcl/conversions.h>
 #include <visualization_msgs/Marker.h>
 #include <pcl/common/centroid.h>
+#include <math.h> 
+#include <Eigen/Geometry> 
 
 ros::Publisher pub,pub_pn;
 pcl::PassThrough<pcl::PCLPointCloud2> pass, pass_1;
@@ -36,6 +40,10 @@ pcl::ExtractIndices<pcl::PointXYZ> extract;
 
 visualization_msgs::Marker marker;
 Eigen::Vector4f plane_center;
+//tf::Quaternion q;
+tf::Vector3 plane_normal;
+//tf::Vector3 up_vector(1.0, 0.0, 0.0);
+//tf::Vector3 right_vector;
 
 void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
 { 
@@ -70,6 +78,13 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
 
   pcl::compute3DCentroid(*cloud_pcl_ptr, *inliers, plane_center);
 
+  plane_normal = {coefficients->values[0], 
+                  coefficients->values[1],
+                  coefficients->values[2]};
+
+  
+  
+
   marker.header.frame_id = "/camera_depth_optical_frame";
   marker.header.stamp = ros::Time();
   marker.ns = "my_namespace";
@@ -80,10 +95,11 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   marker.pose.position.x = 0;
   marker.pose.position.y = 0;
   marker.pose.position.z = 0;
-  marker.pose.orientation.x = coefficients->values[0];
-  marker.pose.orientation.y = coefficients->values[1];
-  marker.pose.orientation.z = coefficients->values[2];
-  marker.pose.orientation.w = coefficients->values[3];
+  marker.pose.orientation.x = q.getX() ;
+  marker.pose.orientation.y = q.getY() ;
+  marker.pose.orientation.z = q.getZ() ;
+  marker.pose.orientation.w = q.getW() ;
+                 
   marker.scale.x = 1;
   marker.scale.y = 0.1;
   marker.scale.z = 0.1;
@@ -91,7 +107,8 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   marker.color.r = 0.0;
   marker.color.g = 1.0;
   marker.color.b = 0.0;
-
+  ROS_INFO("%f  %f  %f  %f %f", marker.pose.orientation.x, 
+        marker.pose.orientation.y, marker.pose.orientation.z, marker.pose.orientation.w);
   pcl::toPCLPointCloud2(*cloud_pcl_f,*cloud_p);
   pub.publish(*cloud_p);
   pub_pn.publish(marker);
