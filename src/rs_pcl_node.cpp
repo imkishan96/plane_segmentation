@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/tf.h>
+#include <tf_conversions/tf_eigen.h>
 // PCL specific includes
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/filters/passthrough.h>
@@ -44,6 +45,8 @@ Eigen::Vector4f plane_center;
 tf::Vector3 plane_normal;
 //tf::Vector3 up_vector(1.0, 0.0, 0.0);
 //tf::Vector3 right_vector;
+Eigen::Vector3d u1, u2, u3 ,a;
+
 
 void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
 { 
@@ -82,9 +85,39 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
                   coefficients->values[1],
                   coefficients->values[2]};
 
-  
-  
+//--------------------------------------testing ----------------------
 
+  a = {coefficients->values[0], coefficients->values[1],
+        coefficients->values[2]};
+
+  u1 = a.normalized();
+
+  if ((fabs((double)u1(0)) > 0.001) || (fabs((double)u1(1)) > 0.001)) {
+      u2 << -u1(1), u1(0), 0;
+  } else {
+      u2 << 0, u1(2), -u1(1);
+  }
+  u2.normalize();
+
+  u3 = u1.cross(u2);
+
+  Eigen::Matrix3d R;  // Rotation matrix defining orientation
+  R.col(0) = u1;
+  R.col(1) = u2;
+  R.col(2) = u3;  
+
+  tf::Matrix3x3 tf_R;
+
+  tf::matrixEigenToTF(R , tf_R);
+  tf::Transform trans;
+  trans.setBasis(tf_R);
+  tf::Quaternion q;
+  geometry_msgs::Quaternion gm_q;
+  q = trans.getRotation();
+
+
+
+//------------------------------ end -------------------------------
   marker.header.frame_id = "/camera_depth_optical_frame";
   marker.header.stamp = ros::Time();
   marker.ns = "my_namespace";
@@ -92,13 +125,13 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   marker.type = visualization_msgs::Marker::ARROW;
   marker.action = visualization_msgs::Marker::ADD;
 
-  marker.pose.position.x = 0;
-  marker.pose.position.y = 0;
-  marker.pose.position.z = 0;
-  marker.pose.orientation.x = q.getX() ;
-  marker.pose.orientation.y = q.getY() ;
-  marker.pose.orientation.z = q.getZ() ;
-  marker.pose.orientation.w = q.getW() ;
+  marker.pose.position.x = (double) plane_center.x();
+  marker.pose.position.y = (double) plane_center.y();
+  marker.pose.position.z = (double) plane_center.z();
+  marker.pose.orientation.x = (double) q.getX() ;
+  marker.pose.orientation.y = (double) q.getY() ;
+  marker.pose.orientation.z = (double) q.getZ() ;
+  marker.pose.orientation.w = (double) q.getW() ;
                  
   marker.scale.x = 1;
   marker.scale.y = 0.1;
@@ -107,8 +140,8 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   marker.color.r = 0.0;
   marker.color.g = 1.0;
   marker.color.b = 0.0;
-  ROS_INFO("%f  %f  %f  %f %f", marker.pose.orientation.x, 
-        marker.pose.orientation.y, marker.pose.orientation.z, marker.pose.orientation.w);
+  ROS_INFO("%f  %f  %f  ", coefficients->values[0], 
+        coefficients->values[1], coefficients->values[2]);
   pcl::toPCLPointCloud2(*cloud_pcl_f,*cloud_p);
   pub.publish(*cloud_p);
   pub_pn.publish(marker);
