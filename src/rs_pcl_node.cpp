@@ -42,10 +42,10 @@ pcl::ExtractIndices<pcl::PointXYZ> extract;
 visualization_msgs::Marker marker;
 Eigen::Vector4f plane_center;
 //tf::Quaternion q;
-tf::Vector3 plane_normal;
+tf::Vector3 plane_normal ;
 //tf::Vector3 up_vector(1.0, 0.0, 0.0);
 //tf::Vector3 right_vector;
-Eigen::Vector3d u1, u2, u3 ,a;
+Eigen::Vector3d u1, u2, u3 ,a , corrected_plane_normal;
 
 
 void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
@@ -85,10 +85,15 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
                   coefficients->values[1],
                   coefficients->values[2]};
 
-//--------------------------------------testing ----------------------
+  double sgn = copysign(1.0, coefficients->values[2]); 
+  
+  corrected_plane_normal = {  coefficients->values[0] * sgn * -1.0,   // this is for the getting constant direction
+                              coefficients->values[1] * sgn * -1.0,
+                              coefficients->values[2] * sgn * -1.0};
 
-  a = {coefficients->values[0], coefficients->values[1],
-        coefficients->values[2]};
+//---------------this worked-------------testing ------100%  ----------------
+  
+  a = corrected_plane_normal;
 
   u1 = a.normalized();
 
@@ -97,6 +102,7 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   } else {
       u2 << 0, u1(2), -u1(1);
   }
+
   u2.normalize();
 
   u3 = u1.cross(u2);
@@ -115,7 +121,50 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   geometry_msgs::Quaternion gm_q;
   q = trans.getRotation();
 
+//----------------not so sure --------------------------------------------
 
+  // Eigen::Vector3d U, D, S ,Un;
+  // U = {0.0 , 0.0 , 1.0};
+  // U.normalize();
+  // D = {coefficients->values[0], coefficients->values[1],
+  //       coefficients->values[2] };
+  // D.normalize();
+  // S = D.cross(U);
+  // Un = D.cross(S);
+
+  // Eigen::Matrix3d R;
+  // R.col(0) = D;
+  // R.col(1) = Un;
+  // R.col(2) = S;
+  // tf::Matrix3x3 tf_R;
+
+  // tf::matrixEigenToTF(R , tf_R);
+  // tf::Transform trans;
+  // trans.setBasis(tf_R);
+  // tf::Quaternion q;
+  // geometry_msgs::Quaternion gm_q;
+  // q = trans.getRotation();
+
+//--------------------- so so --------------------------
+  // Eigen::Vector3d v1,v2,a;
+
+  // v1 = {sgn * coefficients->values[0], sgn * coefficients->values[1], sgn * coefficients->values[2]};
+  // v2 = {1.0, 0.0, 0.0};
+  // v1.normalize();
+  // v2.normalize();
+  // tf::Quaternion q;
+  // geometry_msgs::Quaternion q_geo;
+  // a = v1.cross(v2);
+  // q_geo.x = a.x();
+  // q_geo.y = a.y();
+  // q_geo.z = a.z();
+  // q_geo.w =  v1.dot(v2) +  sqrt(v1.norm() * v1.norm() + v2.norm() * v2.norm());
+
+  // q.setX(a.x());
+  // q.setY(a.y());
+  // q.setZ(a.z()); 
+  // q.setW(v1.dot(v2) +  sqrt(v1.norm() * v1.norm() + v2.norm() * v2.norm()));
+  // q.normalize();
 
 //------------------------------ end -------------------------------
   marker.header.frame_id = "/camera_depth_optical_frame";
@@ -132,6 +181,15 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   marker.pose.orientation.y = (double) q.getY() ;
   marker.pose.orientation.z = (double) q.getZ() ;
   marker.pose.orientation.w = (double) q.getW() ;
+
+  // marker.pose.orientation.x = (double) q.getX() ;
+  // marker.pose.orientation.y = (double) q.getY() ;
+  // marker.pose.orientation.z = (double) q.getZ() ;
+  // marker.pose.orientation.w = (double) q.getW() ;
+
+  // marker.pose.position.x = 0;
+  // marker.pose.position.y = 0;
+  // marker.pose.position.z = 0;  
                  
   marker.scale.x = 1;
   marker.scale.y = 0.1;
@@ -140,8 +198,10 @@ void cloud_cb(const pcl::PCLPointCloud2ConstPtr &cloud)
   marker.color.r = 0.0;
   marker.color.g = 1.0;
   marker.color.b = 0.0;
-  ROS_INFO("%f  %f  %f  ", coefficients->values[0], 
-        coefficients->values[1], coefficients->values[2]);
+  ROS_INFO("%d  %d  %d  %d",(int) (100.0 * coefficients->values[0]), 
+                            (int) (100.0 * coefficients->values[1]), 
+                            (int) (100.0 * coefficients->values[2]), 
+                            (int) (100.0 * coefficients->values[3]));
   pcl::toPCLPointCloud2(*cloud_pcl_f,*cloud_p);
   pub.publish(*cloud_p);
   pub_pn.publish(marker);
