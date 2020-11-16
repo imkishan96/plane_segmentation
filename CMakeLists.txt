@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   tf_conversions
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -214,3 +215,6 @@ target_link_libraries(rs_pcl_node ${catkin_LIBRARIES})
 
 add_executable(tf src/tf.cpp)
 target_link_libraries(tf ${catkin_LIBRARIES})
+
+add_executable(tf_lis src/tf_lis.cpp)
+target_link_libraries(tf_lis ${catkin_LIBRARIES})
