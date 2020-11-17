@@ -4,6 +4,7 @@
 #include <tf/LinearMath/Quaternion.h>
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_broadcaster.h>
+#include <std_msgs/Float64.h>
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "my_tf_listener");
@@ -11,9 +12,11 @@ int main(int argc, char** argv){
   ros::NodeHandle nh;
 
   tf::TransformListener listener;
-  ros::Publisher pub;
+  ros::Publisher pub, pub_angle_x, pub_angle_y;
   visualization_msgs::Marker marker;
   pub = nh.advertise<visualization_msgs::Marker>("raw_normal_marker", 1);
+  pub_angle_x = nh.advertise<std_msgs::Float64>("x_angle",10);
+  pub_angle_y = nh.advertise<std_msgs::Float64>("y_angle",10);
   tf::TransformBroadcaster br;
 
   ros::Rate rate(400.0);
@@ -90,6 +93,11 @@ int main(int argc, char** argv){
     double ay = atan2(sqrt(z * z + x * x ),y);
     double az = atan2(sqrt(x * x + y * y ),z);
     ROS_INFO("X:%f, Y:%f, Z:%f, AX:%f, AZ:%f ", x ,y, z, ax,az);
+    std_msgs::Float64 ax_pub, ay_pub;
+    ax_pub.data = ax;
+    ay_pub.data = az;
+    pub_angle_x.publish(ax_pub);
+    pub_angle_y.publish(ay_pub);
 
     rate.sleep();
   }
