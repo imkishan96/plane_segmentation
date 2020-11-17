@@ -9,7 +9,7 @@ int main(int argc, char** argv){
   tf::Transform transform;
   tf::Quaternion q;
 
-  ros::Rate rate(100.0);
+  ros::Rate rate(400.0);
   while (node.ok()){
     transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
     q.setRPY(-1.57,0.0,-1.57);
