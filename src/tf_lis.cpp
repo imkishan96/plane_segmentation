@@ -12,11 +12,13 @@ int main(int argc, char** argv){
   ros::NodeHandle nh;
 
   tf::TransformListener listener;
-  ros::Publisher pub, pub_angle_x, pub_angle_y;
+  ros::Publisher pub, pub_angle_x, pub_angle_y, pub_theta, pub_phi;
   visualization_msgs::Marker marker;
   pub = nh.advertise<visualization_msgs::Marker>("raw_normal_marker", 1);
   pub_angle_x = nh.advertise<std_msgs::Float64>("x_angle",10);
   pub_angle_y = nh.advertise<std_msgs::Float64>("y_angle",10);
+  pub_theta = nh.advertise<std_msgs::Float64>("theta_angle",10);
+  pub_phi = nh.advertise<std_msgs::Float64>("phi_angle",10);
   tf::TransformBroadcaster br;
 
   ros::Rate rate(400.0);
@@ -93,11 +95,21 @@ int main(int argc, char** argv){
     double ay = atan2(sqrt(z * z + x * x ),y);
     double az = atan2(sqrt(x * x + y * y ),z);
     ROS_INFO("X:%f, Y:%f, Z:%f, AX:%f, AZ:%f ", x ,y, z, ax,az);
-    std_msgs::Float64 ax_pub, ay_pub;
+
+    double R = sqrt(x*x + y*y + z*z);
+    double theta = acos(x/R);
+    double phi = acos(y/R);
+
+    std_msgs::Float64 ax_pub, ay_pub, theta_pub, phi_pub;
     ax_pub.data = ax;
     ay_pub.data = az;
+    theta_pub.data = theta;
+    phi_pub.data = phi;
+
     pub_angle_x.publish(ax_pub);
     pub_angle_y.publish(ay_pub);
+    pub_theta.publish(theta_pub);
+    pub_phi.publish(phi_pub);
 
     rate.sleep();
   }
