@@ -20,7 +20,7 @@ int main(int argc, char** argv){
   while (nh.ok()){
     tf::StampedTransform transform, transform_imu;
     try{
-      listener.lookupTransform("/new_odom", "/plane_normal_tf",
+      listener.lookupTransform("/camera_imu_optical_frame", "/plane_normal_tf",
                                ros::Time(0), transform);
       listener.lookupTransform("/odom", "/camera_imu_optical_frame",
                                ros::Time(0), transform_imu);    
@@ -35,7 +35,7 @@ int main(int argc, char** argv){
     tf::Transform tf_imu_odom ;
 
     q_imu = transform_imu.getRotation();
-    q_marker = transform.getRotation();
+
     double roll, pitch, yaw;
     tf::Matrix3x3(q_imu).getRPY(roll, pitch, yaw);
 
@@ -45,9 +45,14 @@ int main(int argc, char** argv){
     tf_imu_odom.setRotation(q_imu_odom.inverse());
     br.sendTransform(tf::StampedTransform(tf_imu_odom, ros::Time::now(), "camera_imu_optical_frame", "new_odom"));
 
+
+    tf::Transform tf_marker_new_odom;
+    tf_marker_new_odom = transform.inverse() * tf_imu_odom ;
+    q_marker = tf_marker_new_odom.inverse().getRotation();
+
     marker.header.frame_id = "/new_odom";
     marker.header.stamp = ros::Time();
-    marker.ns = "normal_raw";
+    marker.ns = "normal_for_new_odom";
     marker.id = 0;
     marker.type = visualization_msgs::Marker::ARROW;
     marker.action = visualization_msgs::Marker::ADD;
@@ -65,10 +70,26 @@ int main(int argc, char** argv){
     marker.scale.y = 0.1;
     marker.scale.z = 0.1;
     marker.color.a = 1.0; 
-    marker.color.r = 0.0;
-    marker.color.g = 1.0;
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
     marker.color.b = 0.0;
     pub.publish(marker);
+
+    tf::Vector3 start_vector, end_vector;
+    start_vector = {1.0, 0.0, 0.0};
+    tf::Transform new_tf;
+    new_tf.setOrigin( tf::Vector3(0.0, 0.0, 0.0));
+    new_tf.setRotation(q_marker);
+    end_vector = new_tf * start_vector ;
+    double x,y,z;
+
+    x = (double) end_vector.getX();
+    y = (double) end_vector.getY();
+    z = (double) end_vector.getZ();
+    double ax = atan2(sqrt(y * y + z * z ),x);
+    double ay = atan2(sqrt(z * z + x * x ),y);
+    double az = atan2(sqrt(x * x + y * y ),z);
+    ROS_INFO("X:%f, Y:%f, Z:%f, AX:%f, AZ:%f ", x ,y, z, ax,az);
 
     rate.sleep();
   }
