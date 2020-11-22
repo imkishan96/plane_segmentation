@@ -18,8 +18,10 @@
         <param name="fixed_frame" type="string" value="odom" />
         <param name="reverse_tf" type="bool" value="false" />
     </node>
-    <!--node pkg="rs_pcl_demo" type="tf" name="tf" /-->
-    <!--node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" /-->
+    <node pkg="rs_pcl_demo" type="tf" name="tf" />
+    <node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" />
+    <node pkg="rs_pcl_demo" type="tf_lis" name="tf_lis" />
+
     <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find rs_pcl_demo)/rviz/rs_cam_imu.rviz" required="true"/-->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rs_pcl_demo)/rviz/debug.rviz" required="true"/>
 </launch>
