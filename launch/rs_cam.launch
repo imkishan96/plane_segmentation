@@ -32,8 +32,8 @@
   <arg name="color_fps"           default="30"/>
   <arg name="gyro_fps"            default="400"/>
   <arg name="accel_fps"           default="250"/>
-  <arg name="enable_gyro"         default="false"/>
-  <arg name="enable_accel"        default="false"/>
+  <arg name="enable_gyro"         default="true"/>
+  <arg name="enable_accel"        default="true"/>
 
   <arg name="enable_pointcloud"         default="true"/>
   <arg name="pointcloud_texture_stream" default="RS2_STREAM_COLOR"/>
@@ -114,5 +114,5 @@
   </group>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rs_pcl_demo)/launch/config.rviz" />
-  <node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" />
+  <!--node pkg="rs_pcl_demo" type="rs_pcl_node" name="rs_pcl_node" /-->
 </launch>
