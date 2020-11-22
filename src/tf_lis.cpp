@@ -5,6 +5,7 @@
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_broadcaster.h>
 #include <std_msgs/Float64.h>
+#include <rs_pcl_demo/angle_data.h>
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "my_tf_listener");
@@ -12,13 +13,10 @@ int main(int argc, char** argv){
   ros::NodeHandle nh;
 
   tf::TransformListener listener;
-  ros::Publisher pub, pub_angle_x, pub_angle_y, pub_theta, pub_phi;
   visualization_msgs::Marker marker;
-  pub = nh.advertise<visualization_msgs::Marker>("raw_normal_marker", 1);
-  pub_angle_x = nh.advertise<std_msgs::Float64>("x_angle",10);
-  pub_angle_y = nh.advertise<std_msgs::Float64>("y_angle",10);
-  pub_theta = nh.advertise<std_msgs::Float64>("theta_angle",10);
-  pub_phi = nh.advertise<std_msgs::Float64>("phi_angle",10);
+  ros::Publisher pub (nh.advertise<visualization_msgs::Marker>("raw_normal_marker", 1));
+  ros::Publisher pub_floor_angles (nh.advertise<rs_pcl_demo::angle_data>("floor_angle", 10));
+  ros::Publisher pub_IMU_angles (nh.advertise<rs_pcl_demo::angle_data>("IMU_angle", 10));
   tf::TransformBroadcaster br;
 
   ros::Rate rate(400.0);
@@ -39,10 +37,11 @@ int main(int argc, char** argv){
     tf::Quaternion q_imu, q_imu_odom, q_marker;
     tf::Transform tf_imu_odom ;
 
-    q_imu = transform_imu.getRotation();
+    // q_imu = transform_imu.getRotation();
 
     double roll, pitch, yaw;
-    tf::Matrix3x3(q_imu).getRPY(roll, pitch, yaw);
+    // tf::Matrix3x3(q_imu).getRPY(roll, pitch, yaw);
+    tf::Matrix3x3(transform_imu.getRotation()).getRPY(roll, pitch, yaw);
 
     q_imu_odom.setRPY(roll,pitch,0.0);
 
@@ -50,7 +49,7 @@ int main(int argc, char** argv){
     tf_imu_odom.setRotation(q_imu_odom.inverse());
     br.sendTransform(tf::StampedTransform(tf_imu_odom, ros::Time::now(), "camera_imu_optical_frame", "new_odom"));
 
-
+    {
     tf::Transform tf_marker_new_odom;
     tf_marker_new_odom = transform.inverse() * tf_imu_odom ;
     q_marker = tf_marker_new_odom.inverse().getRotation();
@@ -79,6 +78,7 @@ int main(int argc, char** argv){
     marker.color.g = 0.0;
     marker.color.b = 0.0;
     pub.publish(marker);
+    }
 
     tf::Vector3 start_vector, end_vector;
     start_vector = {1.0, 0.0, 0.0};
@@ -94,22 +94,21 @@ int main(int argc, char** argv){
     double ax = atan2(sqrt(y * y + z * z ),x);
     double ay = atan2(sqrt(z * z + x * x ),y);
     double az = atan2(sqrt(x * x + y * y ),z);
-    ROS_INFO("X:%f, Y:%f, Z:%f, AX:%f, AZ:%f ", x ,y, z, ax,az);
+    //ROS_INFO("X:%f, Y:%f, Z:%f, AX:%f, AZ:%f ", x ,y, z, ax,az);
 
     double R = sqrt(x*x + y*y + z*z);
     double theta = acos(x/R);
     double phi = acos(y/R);
 
-    std_msgs::Float64 ax_pub, ay_pub, theta_pub, phi_pub;
-    ax_pub.data = ax;
-    ay_pub.data = az;
-    theta_pub.data = theta;
-    phi_pub.data = phi;
 
-    pub_angle_x.publish(ax_pub);
-    pub_angle_y.publish(ay_pub);
-    pub_theta.publish(theta_pub);
-    pub_phi.publish(phi_pub);
+    rs_pcl_demo::angle_data floor_angles, IMU_angles;
+    IMU_angles.pitch = ax;
+    IMU_angles.roll = ay;
+    floor_angles.pitch = theta;
+    floor_angles.roll = phi;
+    
+    pub_floor_angles.publish(floor_angles);
+    pub_IMU_angles.publish(IMU_angles);
 
     rate.sleep();
   }

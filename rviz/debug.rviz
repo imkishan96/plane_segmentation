@@ -110,8 +110,6 @@ Visualization Manager:
           Value: false
         camera_link:
           Value: false
-        new_odom:
-          Value: true
         odom:
           Value: true
         plane_normal_tf:
@@ -149,8 +147,6 @@ Visualization Manager:
                   camera_infra2_frame:
                     camera_infra2_optical_frame:
                       {}
-            new_odom:
-              {}
       Update Interval: 0
       Value: true
     - Alpha: 0.5
@@ -234,7 +230,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: new_odom
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -273,10 +269,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8750007152557373
+      Pitch: 0.6700007319450378
       Target Frame: <Fixed Frame>
       Value: ThirdPersonFollower (rviz)
-      Yaw: 5.135002613067627
+      Yaw: 0.44681739807128906
     Saved: ~
 Window Geometry:
   Displays:
