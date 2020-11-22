@@ -34,20 +34,15 @@ int main(int argc, char** argv){
       continue;
     }
 
-    tf::Quaternion q_imu, q_imu_odom, q_marker;
-    tf::Transform tf_imu_odom ;
-
-    // q_imu = transform_imu.getRotation();
-
+    tf::Quaternion q_marker;
+    
     double roll, pitch, yaw;
-    // tf::Matrix3x3(q_imu).getRPY(roll, pitch, yaw);
     tf::Matrix3x3(transform_imu.getRotation()).getRPY(roll, pitch, yaw);
-
+    tf::Quaternion q_imu_odom;
     q_imu_odom.setRPY(roll,pitch,0.0);
-
-    tf_imu_odom.setOrigin(transform_imu.inverse().getOrigin());
-    tf_imu_odom.setRotation(q_imu_odom.inverse());
+    tf::Transform tf_imu_odom (q_imu_odom.inverse() , transform_imu.inverse().getOrigin()) ;
     br.sendTransform(tf::StampedTransform(tf_imu_odom, ros::Time::now(), "camera_imu_optical_frame", "new_odom"));
+    
 
     {
     tf::Transform tf_marker_new_odom;
