@@ -1,6 +1,16 @@
 <!-- ComplementaryFilter launch file -->
 <launch>
 
+  <!-- <node pkg="nodelet" type="nodelet" name="PhidgetsImuNodelet" 
+    args="load phidgets_imu/PhidgetsImuNodelet imu_manager" 
+    output="screen">
+
+    # supported data rates: 4 8 16 24 32 40 ... 1000 (in ms)
+    <param name="period" value="40"/>
+
+  </node> -->
+  <param name="use_sim_time" value="true"/>
+  
   <node pkg="imu_complementary_filter" type="complementary_filter_node"
       name="complementary_filter_gain_node" output="screen">
     <param name="do_bias_estimation" value="true"/>
